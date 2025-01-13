@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Communes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Liste des Communes</h1>
+        <a href="{% url 'commune_create' %}" class="btn btn-primary mb-3">Ajouter une Commune</a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Moughataa</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for commune in communes %}
+                <tr>
+                    <td>{{ commune.code }}</td>
+                    <td>{{ commune.name }}</td>
+                    <td>{{ commune.type }}</td>
+                    <td>{{ commune.moughataa.label }}</td>
+                    <td>
+                        <a href="{% url 'commune_update' commune.id %}" class="btn btn-warning btn-sm">Modifier</a>
+                        <a href="{% url 'commune_delete' commune.id %}" class="btn btn-danger btn-sm">Supprimer</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

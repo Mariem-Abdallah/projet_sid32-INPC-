@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Types de Produits</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Liste des Types de Produits</h1>
+        <a href="{% url 'producttype_create' %}" class="btn btn-primary mb-3">Ajouter un Type de Produit</a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Label</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producttype in producttypes %}
+                <tr>
+                    <td>{{ producttype.code }}</td>
+                    <td>{{ producttype.label }}</td>
+                    <td>{{ producttype.description }}</td>
+                    <td>
+                        <a href="{% url 'producttype_update' producttype.id %}" class="btn btn-warning btn-sm">Modifier</a>
+                        <a href="{% url 'producttype_delete' producttype.id %}" class="btn btn-danger btn-sm">Supprimer</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
