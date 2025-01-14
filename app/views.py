@@ -2,6 +2,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Wilaya, Moughataa, Commune, PointDeVente, ProductType, Product, Cart, CartProduct
 from .forms import WilayaForm, MoughataaForm, CommuneForm, PointDeVenteForm, ProductTypeForm, ProductForm, CartForm, CartProductForm
 
+
+def home(request):
+    return render(request, 'home.html')
+
 # Wilaya Views
 def wilaya_list(request):
  wilayas = Wilaya.objects.all() 

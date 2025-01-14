@@ -77,3 +77,14 @@ class CartProduct(models.Model):
     point_of_sale = models.ForeignKey(PointDeVente, on_delete=models.CASCADE, null=True, blank=True)
     def __str__(self):
         return f"{self.product.name} - {self.point_of_sale.code}"
+
+# Modèle pour ProductPrice
+class ProductPrice(models.Model):
+    value = models.FloatField()
+    date_from = models.DateField()
+    date_to = models.DateField()
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    point_of_sale = models.ForeignKey(PointDeVente, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.product.name} - {self.value} - {self.date_from} à {self.date_to}"

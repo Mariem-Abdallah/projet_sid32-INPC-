@@ -2,6 +2,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('', views.home, name='home'),
+    # Ajoute ici les autres routes CRUD pour les différentes tables
+
+
     # Wilaya URLs
     path('wilayas/', views.wilaya_list, name='wilaya_list'),
     path('wilayas/create/', views.wilaya_create, name='wilaya_create'),
