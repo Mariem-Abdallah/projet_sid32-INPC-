@@ -9,7 +9,21 @@
 <body>
     <div class="container mt-4">
         <h1>Liste des Moughataas</h1>
+
+        <!-- Bouton Ajouter -->
         <a href="{% url 'moughataa_create' %}" class="btn btn-primary mb-3">Ajouter une Moughataa</a>
+
+        <!-- Bouton Exportation -->
+        <a href="{% url 'export_moughataas' %}" class="btn btn-success mb-3">Exporter en Excel</a>
+
+        <!-- Formulaire d'importation -->
+        <form action="{% url 'import_moughataas' %}" method="post" enctype="multipart/form-data" class="mb-3">
+            {% csrf_token %}
+            <input type="file" name="file" required>
+            <button type="submit" class="btn btn-primary">Importer depuis Excel</button>
+        </form>
+
+        <!-- Tableau des Moughataas -->
         <table class="table">
             <thead>
                 <tr>
@@ -26,8 +40,9 @@
                     <td>{{ moughataa.label }}</td>
                     <td>{{ moughataa.wilaya.name }}</td>
                     <td>
-                        <a href="{% url 'moughataa_update' id=moughataa.id %}" class="btn btn-warning btn-sm">Modifier</a>
-                        <a href="{% url 'moughataa_delete' id=moughataa.id %}" class="btn btn-danger btn-sm">Supprimer</a>
+                        <a href="{% url 'moughataa_update' moughataa.id %}" class="btn btn-warning btn-sm">Modifier</a>
+                        <a href="{% url 'moughataa_delete' moughataa.id %}" class="btn btn-danger btn-sm">Supprimer</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

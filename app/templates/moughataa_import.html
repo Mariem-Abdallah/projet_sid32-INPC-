@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Importer des Moughataas</h2>
+    <form action="{% url 'import_moughataas' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="file" required>
+        <button type="submit" class="btn btn-primary">Importer</button>
+    </form>
+{% endblock %}

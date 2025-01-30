@@ -1,22 +1,37 @@
-version: '3'
+version: '3.8'
 
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:23093"
     volumes:
       - .:/app
     ports:
-      - "23093:8000"
+      - "23093:23093"  # Exposition du port pour Django
     depends_on:
       - db
+    environment:
+      MYSQL_DATABASE: inpc_db
+      MYSQL_USER: user  # Un utilisateur non-root
+      MYSQL_PASSWORD: 23093
+      MYSQL_ROOT_PASSWORD: 23093
+    networks:
+      - inpc_network
 
   db:
-    image: postgres
+    image: mysql:latest
     restart: always
     environment:
-      POSTGRES_DB: inpc_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      MYSQL_DATABASE: inpc_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 23093
+      MYSQL_ROOT_PASSWORD: 23093
     ports:
-      - "24093:5432"
+      - "24093:3306"  # Exposition du port pour MySQL
+    networks:
+      - inpc_network
+
+networks:
+  inpc_network:
+    driver: bridge
+

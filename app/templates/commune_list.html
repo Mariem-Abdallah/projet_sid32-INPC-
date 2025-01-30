@@ -10,12 +10,14 @@
     <div class="container mt-4">
         <h1>Liste des Communes</h1>
         <a href="{% url 'commune_create' %}" class="btn btn-primary mb-3">Ajouter une Commune</a>
+        <a href="{% url 'export_communes' %}" class="btn btn-success mb-3">Exporter en Excel</a>
+        <a href="{% url 'import_communes' %}" class="btn btn-info mb-3">Importer depuis Excel</a>
+
         <table class="table">
             <thead>
                 <tr>
                     <th>Code</th>
                     <th>Nom</th>
-                    <th>Type</th>
                     <th>Moughataa</th>
                     <th>Actions</th>
                 </tr>
@@ -25,7 +27,6 @@
                 <tr>
                     <td>{{ commune.code }}</td>
                     <td>{{ commune.name }}</td>
-                    <td>{{ commune.type }}</td>
                     <td>{{ commune.moughataa.label }}</td>
                     <td>
                         <a href="{% url 'commune_update' commune.id %}" class="btn btn-warning btn-sm">Modifier</a>

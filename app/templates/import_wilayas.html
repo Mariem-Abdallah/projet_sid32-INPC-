@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Importer des Wilayas depuis un fichier Excel</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="excel_file" accept=".xlsx">
+    <button type="submit" class="btn btn-primary">Importer</button>
+</form>
+
+<a href="{% url 'wilaya_list' %}" class="btn btn-secondary">Retour</a>
+{% endblock %}

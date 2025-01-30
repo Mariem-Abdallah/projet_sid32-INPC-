@@ -9,28 +9,35 @@
 <body>
     <div class="container mt-4">
         <h1>Liste des Produits dans les Paniers</h1>
+
+        <a href="{% url 'export_cartproduct' %}" class="btn btn-success mb-3">Exporter en Excel</a>
+        <form action="{% url 'import_cartproduct' %}" method="post" enctype="multipart/form-data" class="mb-3">
+            {% csrf_token %}
+            <input type="file" name="excel_file" required>
+            <button type="submit" class="btn btn-info">Importer Excel</button>
+        </form>
+
         <a href="{% url 'cartproduct_create' %}" class="btn btn-primary mb-3">Ajouter un Produit au Panier</a>
+
         <table class="table">
             <thead>
                 <tr>
+                    <th>Panier</th>
                     <th>Produit</th>
-                    <th>Point de Vente</th>
-                    <th>Poids</th>
-                    <th>Valeur</th>
-                    <th>Date de Début</th>
-                    <th>Date de Fin</th>
+                    <th>Pondération</th>
+                    <th>Date Début</th>
+                    <th>Date Fin</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for cartproduct in cartproducts %}
                 <tr>
+                    <td>{{ cartproduct.cart.name }}</td>
                     <td>{{ cartproduct.product.name }}</td>
-                    <td>{{ cartproduct.point_of_sale.code }}</td>
                     <td>{{ cartproduct.weight }}</td>
-                    <td>{{ cartproduct.value }}</td>
                     <td>{{ cartproduct.date_from }}</td>
-                    <td>{{ cartproduct.date_to }}</td>
+                    <td>{{ cartproduct.date_to|default:"-" }}</td>
                     <td>
                         <a href="{% url 'cartproduct_update' cartproduct.id %}" class="btn btn-warning btn-sm">Modifier</a>
                         <a href="{% url 'cartproduct_delete' cartproduct.id %}" class="btn btn-danger btn-sm">Supprimer</a>

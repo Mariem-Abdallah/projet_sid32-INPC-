@@ -1,50 +1,65 @@
 from django import forms
-from .models import Wilaya, Moughataa, Commune, PointDeVente, ProductType, Product, Cart, CartProduct
+from .models import Wilaya, Moughataa, Commune, PointDeVente, Product, ProductType, Cart, CartProduct, ProductPrice
 
-# Wilaya Form
+
+# Formulaire pour Wilaya
 class WilayaForm(forms.ModelForm):
     class Meta:
         model = Wilaya
         fields = ['code', 'name']
 
-# Moughataa Form
+
+# Formulaire pour Moughataa
 class MoughataaForm(forms.ModelForm):
     class Meta:
         model = Moughataa
         fields = ['code', 'label', 'wilaya']
 
-# Commune Form
+
+# Formulaire pour Commune
 class CommuneForm(forms.ModelForm):
     class Meta:
         model = Commune
-        fields = ['code', 'name', 'type', 'moughataa']
+        fields = ['code', 'name', 'moughataa']
 
-# PointDeVente Form
+
+# Formulaire pour PointDeVente
 class PointDeVenteForm(forms.ModelForm):
     class Meta:
         model = PointDeVente
         fields = ['code', 'type', 'gps_lat', 'gps_lon', 'commune']
 
-# ProductType Form
+
+# Formulaire pour ProductType
 class ProductTypeForm(forms.ModelForm):
     class Meta:
         model = ProductType
         fields = ['code', 'label', 'description']
 
-# Product Form
+
+# Formulaire pour Product
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['code', 'name', 'description', 'unit_measure', 'product_type']
 
-# Cart Form
+
+# Formulaire pour Cart
 class CartForm(forms.ModelForm):
     class Meta:
         model = Cart
         fields = ['code', 'name', 'description']
 
-# CartProduct Form
+
+# Formulaire pour CartProduct
 class CartProductForm(forms.ModelForm):
     class Meta:
         model = CartProduct
-        fields = ['weight', 'value', 'date_from', 'date_to', 'product', 'point_of_sale']
+        fields = ['cart', 'product', 'weight', 'date_from', 'date_to']
+
+
+# Formulaire pour ProductPrice
+class ProductPriceForm(forms.ModelForm):
+    class Meta:
+        model = ProductPrice
+        fields = ['product', 'point_of_sale', 'value', 'date_from', 'date_to']

@@ -9,7 +9,13 @@
 <body>
     <div class="container mt-4">
         <h1>Liste des Wilayas</h1>
+
+        <!-- Boutons Ajouter et Exporter -->
         <a href="{% url 'wilaya_create' %}" class="btn btn-primary mb-3">Ajouter une Wilaya</a>
+        <a href="{% url 'export_wilayas' %}" class="btn btn-success mb-3">Exporter en Excel</a>
+        <a href="{% url 'import_wilayas' %}" class="btn btn-secondary mb-3">Importer depuis Excel</a>
+
+        <!-- Tableau des Wilayas -->
         <table class="table">
             <thead>
                 <tr>
