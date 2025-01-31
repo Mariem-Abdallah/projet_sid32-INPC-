@@ -4,6 +4,7 @@ from .forms import ProductPriceForm, WilayaForm, MoughataaForm, CommuneForm, Poi
 import openpyxl
 from django.http import HttpResponse ,HttpResponseRedirect
 import os
+import csv
 from django.conf import settings
 from django.contrib import messages
 from django.urls import reverse
@@ -74,23 +75,62 @@ def export_wilayas_to_excel(request):
 #wilaya import 
 
 
+
+
 def import_wilayas_from_excel(request):
     if request.method == "POST":
         excel_file = request.FILES["excel_file"]
-        
-        # Charger le fichier Excel
-        workbook = openpyxl.load_workbook('excel_file')
-        sheet = workbook.active
 
-        # Lire les données en ignorant la première ligne
-        sheet_wilayas = workbook["Wilayas"]
-        for row in sheet_wilayas.iter_rows(min_row=2, values_only=True):
-         wilaya_code, wilaya_name = row
-         Wilaya.objects.update_or_create(code=wilaya_code, name='wilaya')
+        # Vérification du type de fichier
+        if excel_file.name.endswith('.xlsx'):
+            # Si c'est un fichier Excel
+            workbook = openpyxl.load_workbook(excel_file)
+            sheet = workbook.active
 
-        # Ajouter un message de succès
+            # Tente de récupérer les colonnes
+            headers = [cell.value for cell in sheet[1]]
+            
+            if "wilaya_code" in headers and "wilaya_name" in headers:
+                wilaya_code_index = headers.index("wilaya_code")
+                wilaya_name_index = headers.index("wilaya_name")
+                
+                # Lire les données à partir de la 2e ligne
+                for row in sheet.iter_rows(min_row=2, values_only=True):
+                    wilaya_code = row[wilaya_code_index]
+                    wilaya_name = row[wilaya_name_index]
+
+                    # Enregistrer ou mettre à jour les wilayas
+                    Wilaya.objects.update_or_create(code=wilaya_code, defaults={"name": wilaya_name})
+
+            else:
+                messages.error(request, "Le fichier Excel ne contient pas les colonnes attendues ('wilaya_code', 'wilaya_name').")
+                return redirect("wilaya_list")
+            
+        elif excel_file.name.endswith('.csv'):
+            # Si c'est un fichier CSV
+            csv_file = csv.reader(excel_file.read().decode('utf-8').splitlines())
+            headers = next(csv_file)  # Lire la première ligne comme les en-têtes
+
+            if "wilaya_code" in headers and "wilaya_name" in headers:
+                wilaya_code_index = headers.index("wilaya_code")
+                wilaya_name_index = headers.index("wilaya_name")
+
+                for row in csv_file:
+                    wilaya_code = row[wilaya_code_index]
+                    wilaya_name = row[wilaya_name_index]
+
+                    # Enregistrer ou mettre à jour les wilayas
+                    Wilaya.objects.update_or_create(code=wilaya_code, defaults={"name": wilaya_name})
+
+            else:
+                messages.error(request, "Le fichier CSV ne contient pas les colonnes attendues ('wilaya_code', 'wilaya_name').")
+                return redirect("wilaya_list")
+        else:
+            messages.error(request, "Le fichier doit être au format .xlsx ou .csv")
+            return redirect("wilaya_list")
+
+        # Message de succès
         messages.success(request, "Importation réussie !")
-
         return redirect("wilaya_list")
 
     return render(request, "import_wilayas.html")
@@ -155,21 +195,29 @@ def import_moughataas(request):
     if request.method == "POST" and request.FILES["file"]:
         file = request.FILES["file"]
         wb = openpyxl.load_workbook(file)
-        ws = wb.active
+        ws = wb.active  # Ouvre la première feuille du fichier Excel
 
-        for row in ws.iter_rows(min_row=2, values_only=True):
-            code, label, wilaya_id = row[1], row[2], row[3]
+        for row in ws.iter_rows(min_row=2, values_only=True):  # Ignorer la première ligne (en-têtes)
+            wilaya_name, moughataa_name, moughataa_code = row[0], row[1], row[2]
 
-            # Vérifier si la Moughataa existe déjà
-            moughataa, created = Moughataa.objects.update_or_create(
-                code=code,
-                defaults={"label": label, "wilaya_id": wilaya_id}
-            )
+            # Trouver l'ID de la Wilaya à partir du nom
+            wilaya = Wilaya.objects.filter(name=wilaya_name).first()
+
+            if wilaya:
+                # Créer ou mettre à jour la Moughataa
+                Moughataa.objects.update_or_create(
+                    code=moughataa_code,  # Code unique pour chaque Moughataa
+                    defaults={"label": moughataa_name, "wilaya": wilaya}
+                )
+            else:
+                # Si la Wilaya n'est pas trouvée, ignorer ou gérer cette erreur
+                print(f"Wilaya '{wilaya_name}' non trouvée. La Moughataa '{moughataa_name}' ne sera pas ajoutée.")
 
         messages.success(request, "Importation des Moughataas réussie !")
         return redirect("moughataa_list")
 
     return render(request, "moughataa_import.html")
+
 
 # Commune Views
 def commune_list(request):
@@ -227,7 +275,6 @@ def export_communes(request):
     workbook.save(response)
     return response
 
-# Importer les Communes depuis un fichier Excel
 def import_communes(request):
     if request.method == "POST" and request.FILES["file"]:
         file = request.FILES["file"]
@@ -237,26 +284,31 @@ def import_communes(request):
             return HttpResponseRedirect(reverse("commune_list"))
 
         workbook = openpyxl.load_workbook(file)
-        sheet = workbook.active
-
+        sheet = workbook.active  # ou utilisez sheet = workbook['Nom_de_votre_onglet'] si nécessaire
+        
         for row in sheet.iter_rows(min_row=2, values_only=True):  # Ignorer la première ligne (en-têtes)
-            code, name, moughataa_label = row  # Assurez-vous que le fichier suit cet ordre
+            commune_code = row[0]  # Colonne A: Code de la commune
+            commune_name = row[1]  # Colonne B: Nom de la commune
+            moughataa_name = row[2]  # Colonne C: Nom de la Moughataa
 
             try:
-                moughataa = Moughataa.objects.get(label=moughataa_label)
+                # Récupérer la Moughataa associée par son nom
+                moughataa = Moughataa.objects.get(label=moughataa_name)
             except Moughataa.DoesNotExist:
-                messages.error(request, f"La Moughataa '{moughataa_label}' n'existe pas.")
+                messages.error(request, f"La Moughataa '{moughataa_name}' n'existe pas.")
                 continue
 
+            # Créer ou mettre à jour la commune
             Commune.objects.update_or_create(
-                code=code,
-                defaults={"name": name, "moughataa": moughataa},
+                code=commune_code,
+                defaults={"name": commune_name, "moughataa": moughataa}
             )
 
-        messages.success(request, "Importation des Communes réussie.")
+        messages.success(request, "Importation des Communes réussie !")
         return HttpResponseRedirect(reverse("commune_list"))
 
-    return render(request, "import_communes.html")
+    return render(request, "commune_import.html")
+
 
 # PointDeVente Views
 def pointdevente_list(request):
